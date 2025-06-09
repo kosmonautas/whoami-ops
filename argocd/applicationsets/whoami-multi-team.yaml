@@ -5,20 +5,17 @@ metadata:
   namespace: argocd
 spec:
   generators:
-    - matrix:
-        generators:
-          - list:
-              elements:
-                - team: team-a
-                  project: team-a-whoami
-                - team: team-b
-                  project: team-b-whoami
-          - list:
-              elements:
-                - env: staging
-                  branch: staging
-                - env: production
-                  branch: main
+    - list:
+        elements:
+          - team: team-a
+            env: staging
+            branch: staging
+          - team: team-a
+            env: production
+            branch: main
+          - team: team-b
+            env: production
+            branch: main
 
   template:
     metadata:
@@ -37,8 +34,7 @@ spec:
         helm:
           valueFiles:
             - values.yaml
-            # - values-{{env}}.yaml
-            - values-{{team}}-{{env}}.yaml
+            - values/{{team}}/{{env}}.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: "{{team}}-{{env}}"
