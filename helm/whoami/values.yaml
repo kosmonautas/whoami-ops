@@ -1,10 +1,10 @@
 replicaCount: 2
 
 # injected by ci
-COMMIT: "labas"
+COMMIT: ""
 
-env:
-  WHOAMI_NAME: "labs"
+# env:
+#   WHOAMI_NAME: "labs"
 
 image:
   # repository: ghcr.io/kosmonautas/whoami

@@ -1,3 +1,8 @@
+COMMIT: "v0.0.0"
+
+env:
+  WHOAMI_NAME: "DOGS-PRODUCTION"
+
 ingress:
   enabled: true
   annotations:
