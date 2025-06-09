@@ -1,7 +1,7 @@
 COMMIT: "e891a0b3345a820773514fa9836c05e0981db0e9"
 
 env:
-  WHOAMI_NAME: "DOGS-e891a0b"
+  WHOAMI_NAME: "DOGS-STAGING-e891a0b"
 
 ingress:
   enabled: true
