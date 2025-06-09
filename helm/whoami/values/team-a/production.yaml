@@ -1,7 +1,7 @@
-COMMIT: "a0f495d24fc4104c6d1f459269992f09910bcee9"
+COMMIT: "143c8d31de081fdc4fd949c6d57470dbba70c9cf"
 
 env:
-  WHOAMI_NAME: "DOGS-v0.0.2"
+  WHOAMI_NAME: "DOGS-v0.0.3"
 
 ingress:
   enabled: true
