@@ -8,12 +8,15 @@ spec:
     - list:
         elements:
           - team: team-a
+            project: team-a-whoami
             env: staging
             branch: staging
           - team: team-a
+            project: team-a-whoami
             env: production
             branch: main
           - team: team-b
+            project: team-b-whoami
             env: production
             branch: main
 
