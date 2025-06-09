@@ -1,7 +1,7 @@
-COMMIT: "2ff07a316a512d6dde08370229936984d45d7e67"
+COMMIT: "a0f495d24fc4104c6d1f459269992f09910bcee9"
 
 env:
-  WHOAMI_NAME: "CATS-v0.0.0"
+  WHOAMI_NAME: "CATS-v0.0.2"
 
 ingress:
   enabled: true
