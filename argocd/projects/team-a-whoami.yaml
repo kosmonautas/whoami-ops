@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: team-a-whoami
+  namespace: argocd
+spec:
+  description: "Team A Whoami Service - Isolated project with controlled access"
+
+  sourceRepos:
+    - "https://github.com/kosmonautas/whoami-ops.git"
+
+  destinations:
+    - namespace: "team-a-staging"
+      server: https://kubernetes.default.svc
+    - namespace: "team-a-production"
+      server: https://kubernetes.default.svc
+
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+
+  namespaceResourceWhitelist:
+    - group: "apps"
+      kind: Deployment
+    - group: "apps"
+      kind: ReplicaSet
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+    - group: "networking.k8s.io"
+      kind: Ingress
+
+  roles:
+    - name: team-a-admin
+      policies:
+        - p, proj:team-a-whoami:team-a-admin, applications, *, team-a-whoami/*, allow
+        - p, proj:team-a-whoami:team-a-admin, repositories, *, *, allow
+        - p, proj:team-a-whoami:team-a-admin, logs, get, team-a-whoami/*, allow
+      groups:
+        - kaipsau:team-a-admins
+    - name: team-a-developer
+      policies:
+        - p, proj:team-a-whoami:team-a-developer, applications, get, team-a-whoami/*, allow
+        - p, proj:team-a-whoami:team-a-developer, applications, sync, team-a-whoami/*, allow
+        - p, proj:team-a-whoami:team-a-developer, logs, get, team-a-whoami/*, allow
+      groups:
+        - kaipsau:team-a-developers

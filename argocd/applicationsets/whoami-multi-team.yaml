@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: whoami-multi-team
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - team: team-a
+                  project: team-a-whoami
+                - team: team-b
+                  project: team-b-whoami
+          - list:
+              elements:
+                - env: staging
+                  branch: staging
+                - env: production
+                  branch: main
+
+  template:
+    metadata:
+      name: "whoami-{{team}}-{{env}}"
+      labels:
+        team: "{{team}}"
+        environment: "{{env}}"
+        service: whoami
+        project: "{{project}}"
+    spec:
+      project: "{{project}}"
+      source:
+        repoURL: https://github.com/kosmonautas/whoami-ops.git
+        targetRevision: HEAD
+        path: helm/whoami
+        helm:
+          valueFiles:
+            - values.yaml
+            # - values-{{env}}.yaml
+            - values-{{team}}-{{env}}.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{team}}-{{env}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
