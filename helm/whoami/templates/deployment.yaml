@@ -1,0 +1,127 @@
+{{- $fullName := include "chart.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "chart.selectorLabels" . | nindent 8 }}
+      annotations:
+        commit: "{{ .Values.COMMIT }}"
+        timestamp: "{{ date "20060102150405" .Release.Time }}"
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort | default .Values.service.port }}
+              protocol: TCP
+          {{- toYaml .Values.healthChecks | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: "PORT"
+              value: "{{ .Values.service.port }}"
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key | quote }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- if .Values.envFrom }}
+          {{- range .Values.envFrom }}
+            - name: {{ .name }}
+              valueFrom:
+              {{- if .secretKeyRef }}
+                {{- with .secretKeyRef }}
+                secretKeyRef:
+                {{- if eq .name ".fullname." }}
+                  name: {{ $fullName }}
+                {{- else }}
+                  name: {{ .name }}
+                {{- end }}
+                  key: {{ .key }}
+                {{- end }}
+              {{- else if .configMapKeyRef }}
+                {{- with .configMapKeyRef }}
+                configMapKeyRef:
+                {{- if eq .name ".fullname." }}
+                  name: {{ $fullName }}
+                {{- else }}
+                  name: {{ .name }}
+                {{- end }}
+                  key: {{ .key }}
+                {{- end }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          volumeMounts:
+            {{- range .Values.secretMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .path }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+            {{- end }}
+            {{- range .Values.configMapMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .path }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+            {{- end }}
+      volumes:
+        {{- range .Values.secretMounts }}
+        - name: {{ .name }}
+          secret:
+          {{- if eq .secretName ".fullname." }}
+            secretName: {{ $fullName }}
+          {{- else }}
+            secretName: {{ .secretName }}
+          {{- end }}
+        {{- end }}
+        {{- range .Values.configMapMounts }}
+        - name: {{ .name }}
+          configMap:
+          {{- if eq .configMapName ".fullname." }}
+            name: {{ $fullName }}
+          {{- else }}
+            name: {{ .configMapName }}
+          {{- end }}
+            items:
+              - key: {{ .subPath }}
+                path: {{ .subPath }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
