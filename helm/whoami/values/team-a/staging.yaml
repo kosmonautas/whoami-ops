@@ -1,7 +1,7 @@
-COMMIT: '123a'
+COMMIT: "b529524569cefc58bc634d89411197ad7b804bb0"
 
 env:
-  WHOAMI_NAME: "DOGS-STAGING"
+  WHOAMI_NAME: "DOGS-b529524"
 
 ingress:
   enabled: true
