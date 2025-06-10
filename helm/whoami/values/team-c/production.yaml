@@ -1,0 +1,18 @@
+COMMIT: "a0f495d24fc4104c6d1f459269992f09910bcee9"
+
+env:
+  WHOAMI_NAME: "HORSES-v0.0.2"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: "letsencrypt"
+    # ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: whoami.horses.monomi.eu
+      paths: ["/"]
+  # tls:
+  #   - secretName:
+  #     hosts:
+  #       -
